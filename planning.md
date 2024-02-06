@@ -1,0 +1,1 @@
+we plan to create a website that allows the viewers to play checkers on
