@@ -1,0 +1,1 @@
+We are going to make a game of checkers 
