@@ -1,9 +1,11 @@
+
 document.addEventListener('DOMContentLoaded', () => {
     const board = document.getElementById('board');
     let squares = [];
     let isRedTurn = true;
+    let selectedSquare = null;
+    let isPieceMoved = false; // Flag to track if a piece has been moved in the current turn
 
-   
     function createBoard() {
         for (let i = 0; i < 8; i++) {
             for (let j = 0; j < 8; j++) {
@@ -40,47 +42,49 @@ document.addEventListener('DOMContentLoaded', () => {
         const row = parseInt(square.dataset.row);
         const col = parseInt(square.dataset.col);
 
-        if (selectedSquare) {
+        // Check if it's the current player's turn and a piece is clicked
+        if ((isRedTurn && square.classList.contains('red-piece')) || (!isRedTurn && square.classList.contains('black-piece'))) {
+            selectPiece(square);
+        } else if (selectedSquare && canMove(selectedSquare, square)) {
             movePiece(selectedSquare, square);
+            isPieceMoved = true; // Set the flag to true after a successful move
             selectedSquare = null;
-            return;
-        }
-
-        if (square.classList.contains('red-piece') || square.classList.contains('black-piece')) {
-            square.classList.add('selected');
-            selectedSquare = square;
+            isRedTurn = !isRedTurn; // Switch turns after a successful move
         }
     }
 
-    function movePiece(fromSquare, toSquare) {
+    function selectPiece(square) {
+        if (selectedSquare) {
+            selectedSquare.classList.remove('selected');
+        }
+        square.classList.add('selected');
+        selectedSquare = square;
+    }
+
+    function canMove(fromSquare, toSquare) {
         const fromRow = parseInt(fromSquare.dataset.row);
         const fromCol = parseInt(fromSquare.dataset.col);
         const toRow = parseInt(toSquare.dataset.row);
         const toCol = parseInt(toSquare.dataset.col);
 
-        const dx = Math.sign(toCol - fromCol);
-        const dy = Math.sign(toRow - fromRow);
-
-        if (Math.abs(toRow - fromRow) === 1 && Math.abs(toCol - fromCol) === 1 && !toSquare.classList.contains('red-piece') && !toSquare.classList.contains('black-piece')) {
-            toSquare.className = fromSquare.className;
-            fromSquare.className = 'square';
-            isRedTurn = !isRedTurn;
-        } else if (Math.abs(toRow - fromRow) === 2 && Math.abs(toCol - fromCol) === 2) {
-            const capturedRow = fromRow + dy;
-            const capturedCol = fromCol + dx;
-            const capturedSquare = document.querySelector(`.square[data-row='${capturedRow}'][data-col='${capturedCol}']`);
-
-            if (capturedSquare && (isRedTurn && capturedSquare.classList.contains('black-piece') || !isRedTurn && capturedSquare.classList.contains('red-piece'))) {
-                toSquare.className = fromSquare.className;
-                fromSquare.className = 'square';
-                capturedSquare.className = 'square';
-                isRedTurn = !isRedTurn;
-            }
-        }
+        return Math.abs(toRow - fromRow) === 1 && Math.abs(toCol - fromCol) === 1 && !toSquare.classList.contains('red-piece') && !toSquare.classList.contains('black-piece');
     }
 
-    let selectedSquare = null;
+    function movePiece(fromSquare, toSquare) {
+        toSquare.className = fromSquare.className;
+        fromSquare.className = 'square';
+    }
 
-  
+    // Add event listener to the board
+    board.addEventListener('click', () => {
+        // Check if a piece has been moved in the current turn
+        if (!isPieceMoved) {
+            return; // Do nothing if no piece has been moved
+        }
+        
+        isPieceMoved = false; // Reset the flag for the next turn
+    });
+
     createBoard();
 });
+
