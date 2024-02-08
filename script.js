@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let squares = [];
     let isRedTurn = true;
 
+   
     function createBoard() {
         for (let i = 0; i < 8; i++) {
             for (let j = 0; j < 8; j++) {
@@ -57,16 +58,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const toRow = parseInt(toSquare.dataset.row);
         const toCol = parseInt(toSquare.dataset.col);
 
+        const dx = Math.sign(toCol - fromCol);
+        const dy = Math.sign(toRow - fromRow);
+
         if (Math.abs(toRow - fromRow) === 1 && Math.abs(toCol - fromCol) === 1 && !toSquare.classList.contains('red-piece') && !toSquare.classList.contains('black-piece')) {
             toSquare.className = fromSquare.className;
             fromSquare.className = 'square';
             isRedTurn = !isRedTurn;
-        } else {
-            return;
+        } else if (Math.abs(toRow - fromRow) === 2 && Math.abs(toCol - fromCol) === 2) {
+            const capturedRow = fromRow + dy;
+            const capturedCol = fromCol + dx;
+            const capturedSquare = document.querySelector(`.square[data-row='${capturedRow}'][data-col='${capturedCol}']`);
+
+            if (capturedSquare && (isRedTurn && capturedSquare.classList.contains('black-piece') || !isRedTurn && capturedSquare.classList.contains('red-piece'))) {
+                toSquare.className = fromSquare.className;
+                fromSquare.className = 'square';
+                capturedSquare.className = 'square';
+                isRedTurn = !isRedTurn;
+            }
         }
     }
 
     let selectedSquare = null;
 
+  
     createBoard();
 });
