@@ -2,8 +2,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const board = document.getElementById('board');
     let squares = [];
     let isRedTurn = true;
+    let canMoveBlack = false;
+    let canMoveRed = true;
 
-   
     function createBoard() {
         for (let i = 0; i < 8; i++) {
             for (let j = 0; j < 8; j++) {
@@ -40,13 +41,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const row = parseInt(square.dataset.row);
         const col = parseInt(square.dataset.col);
 
-        if (selectedSquare) {
+        if (selectedSquare && canMovePiece(square)) {
             movePiece(selectedSquare, square);
             selectedSquare = null;
+            toggleTurn();
             return;
         }
 
-        if (square.classList.contains('red-piece') || square.classList.contains('black-piece')) {
+        if (canSelectPiece(square)) {
             square.classList.add('selected');
             selectedSquare = square;
         }
@@ -64,7 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (Math.abs(toRow - fromRow) === 1 && Math.abs(toCol - fromCol) === 1 && !toSquare.classList.contains('red-piece') && !toSquare.classList.contains('black-piece')) {
             toSquare.className = fromSquare.className;
             fromSquare.className = 'square';
-            isRedTurn = !isRedTurn;
         } else if (Math.abs(toRow - fromRow) === 2 && Math.abs(toCol - fromCol) === 2) {
             const capturedRow = fromRow + dy;
             const capturedCol = fromCol + dx;
@@ -74,13 +75,47 @@ document.addEventListener('DOMContentLoaded', () => {
                 toSquare.className = fromSquare.className;
                 fromSquare.className = 'square';
                 capturedSquare.className = 'square';
-                isRedTurn = !isRedTurn;
             }
         }
     }
 
+    function toggleTurn() {
+        isRedTurn = !isRedTurn;
+        canMoveBlack = !canMoveBlack;
+        canMoveRed = !canMoveRed;
+    }
+
+    function canSelectPiece(square) {
+        if (isRedTurn && square.classList.contains('red-piece') && canMoveRed) {
+            return true;
+        } else if (!isRedTurn && square.classList.contains('black-piece') && canMoveBlack) {
+            return true;
+        }
+        return false;
+    }
+    function canMovePiece(square) {
+        const fromRow = parseInt(selectedSquare.dataset.row);
+        const fromCol = parseInt(selectedSquare.dataset.col);
+        const toRow = parseInt(square.dataset.row);
+        const toCol = parseInt(square.dataset.col);
+    
+        if (isRedTurn && selectedSquare.classList.contains('black-piece')) {
+            // Black piece cannot move backward
+            if (toRow > fromRow)
+                return false;
+        } else if (!isRedTurn && selectedSquare.classList.contains('red-piece')) {
+            // Red piece cannot move backward
+            if (toRow < fromRow)
+                return false;
+        }
+        return true;
+    }
+    
+
+    
+
+
     let selectedSquare = null;
 
-  
     createBoard();
 });
