@@ -71,10 +71,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const fromCol = parseInt(fromSquare.dataset.col);
         const toRow = parseInt(toSquare.dataset.row);
         const toCol = parseInt(toSquare.dataset.col);
-
+    
         const dx = Math.sign(toCol - fromCol);
         const dy = Math.sign(toRow - fromRow);
-
+    
         if (Math.abs(toRow - fromRow) === 1 && Math.abs(toCol - fromCol) === 1 && !toSquare.classList.contains('red-piece') && !toSquare.classList.contains('black-piece')) {
             toSquare.className = fromSquare.className;
             fromSquare.className = 'square';
@@ -82,14 +82,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const capturedRow = fromRow + dy;
             const capturedCol = fromCol + dx;
             const capturedSquare = document.querySelector(`.square[data-row='${capturedRow}'][data-col='${capturedCol}']`);
-
-            if (capturedSquare && (isRedTurn && capturedSquare.classList.contains('black-piece') || !isRedTurn && capturedSquare.classList.contains('red-piece'))) {
+    
+            if (capturedSquare && (isRedTurn && capturedSquare.classList.contains('black-piece') || !isRedTurn && capturedSquare.classList.contains('red-piece')) &&
+                !toSquare.classList.contains('red-piece') && !toSquare.classList.contains('black-piece')) {
                 toSquare.className = fromSquare.className;
                 fromSquare.className = 'square';
                 capturedSquare.className = 'square';
             }
         }
     }
+    
 
     function canMovePiece(fromSquare, toSquare) {
         const fromRow = parseInt(fromSquare.dataset.row);
