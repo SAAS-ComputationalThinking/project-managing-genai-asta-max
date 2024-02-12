@@ -41,11 +41,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const row = parseInt(square.dataset.row);
         const col = parseInt(square.dataset.col);
 
-        if (selectedSquare && canMovePiece(square)) {
-            movePiece(selectedSquare, square);
-            selectedSquare = null;
-            toggleTurn();
-            return;
+        if (selectedSquare) {
+            // If the clicked square contains a piece of the same color, select it instead of moving onto it
+            if (square.classList.contains(selectedSquare.classList.contains('red-piece') ? 'red-piece' : 'black-piece')) {
+                // Deselect the previously selected square and select the new one
+                selectedSquare.classList.remove('selected');
+                square.classList.add('selected');
+                selectedSquare = square;
+                return;
+            }
+
+            // If the selected square is trying to move onto another piece, return without moving
+            if (canMovePiece(selectedSquare, square)) {
+                movePiece(selectedSquare, square);
+                selectedSquare = null;
+                toggleTurn();
+                return;
+            }
         }
 
         if (canSelectPiece(square)) {
@@ -79,6 +91,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function canMovePiece(fromSquare, toSquare) {
+        const fromRow = parseInt(fromSquare.dataset.row);
+        const fromCol = parseInt(fromSquare.dataset.col);
+        const toRow = parseInt(toSquare.dataset.row);
+        const toCol = parseInt(toSquare.dataset.col);
+
+        if (toSquare.classList.contains('red-piece') || toSquare.classList.contains('black-piece')) {
+            return false; // Can't move onto an occupied square
+        }
+
+        if (isRedTurn && fromSquare.classList.contains('black-piece')) {
+            // Black piece cannot move backward
+            if (toRow > fromRow)
+                return false;
+        } else if (!isRedTurn && fromSquare.classList.contains('red-piece')) {
+            // Red piece cannot move backward
+            if (toRow < fromRow)
+                return false;
+        }
+        return true;
+    }
+
     function toggleTurn() {
         isRedTurn = !isRedTurn;
         canMoveBlack = !canMoveBlack;
@@ -93,27 +127,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return false;
     }
-    function canMovePiece(square) {
-        const fromRow = parseInt(selectedSquare.dataset.row);
-        const fromCol = parseInt(selectedSquare.dataset.col);
-        const toRow = parseInt(square.dataset.row);
-        const toCol = parseInt(square.dataset.col);
-    
-        if (isRedTurn && selectedSquare.classList.contains('black-piece')) {
-            // Black piece cannot move backward
-            if (toRow > fromRow)
-                return false;
-        } else if (!isRedTurn && selectedSquare.classList.contains('red-piece')) {
-            // Red piece cannot move backward
-            if (toRow < fromRow)
-                return false;
-        }
-        return true;
-    }
-    
-
-    
-
 
     let selectedSquare = null;
 
