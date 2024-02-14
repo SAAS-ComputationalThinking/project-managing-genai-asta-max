@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (!isRedTurn && fromSquare.classList.contains('red-piece')) {
             // Red piece cannot move backward
             if (toRow < fromRow)
-                return false;
+              return false;
         }
         return true;
     }
